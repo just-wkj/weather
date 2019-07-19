@@ -24,14 +24,18 @@ class Weather {
         $this->guzzleOptions = $options;
     }
 
-    public function getWeather($city,  $type = 'base',  $format = 'json') {
+    public function getWeather($city, $type = 'live', $format = 'json') {
         $url = 'https://restapi.amap.com/v3/weather/weatherInfo';
 
         if (!\in_array(\strtolower($format), ['xml', 'json'])) {
             throw new InvalidArgumentException('Invalid response format: ' . $format);
         }
 
-        if (!\in_array(\strtolower($type), ['base', 'all'])) {
+        $types = [
+            'live'     => 'base',
+            'forecast' => 'all',
+        ];
+        if (!\array_key_exists(\strtolower($type), $types)) {
             throw new InvalidArgumentException('Invalid type value(base/all): ' . $type);
         }
 
@@ -51,5 +55,13 @@ class Weather {
         } catch (\Exception $e) {
             throw new HttpException($e->getMessage(), $e->getCode(), $e);
         }
+    }
+
+    public function getLiveWeather($city, $format = 'json') {
+        return $this->getWeather($city, 'live', $format);
+    }
+
+    public function getForecastWeather($city, $format = 'json') {
+        return $this->getWeather($city, 'forecast', $format);
     }
 }
